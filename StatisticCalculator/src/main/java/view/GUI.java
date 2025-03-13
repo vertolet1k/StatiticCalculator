@@ -17,6 +17,8 @@ public class GUI extends javax.swing.JFrame {
     
     ArrayList<double[]> data = new ArrayList();
     ArrayList<Double> result = new ArrayList();
+    DataController dataController = new ActionWithData();
+    CalcationController calculationController = new Calculation();
 
     /**
      * Creates new form GUI
@@ -108,16 +110,14 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonExitActionPerformed
 
     private void jButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExportActionPerformed
-
+//        dataController.exportData(result);
     }//GEN-LAST:event_jButtonExportActionPerformed
 
     private void jButtonCalcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalcActionPerformed
-        
     }//GEN-LAST:event_jButtonCalcActionPerformed
 
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed
-        DataController dataImport = new ActionWithData();
-        data = dataImport.loadData("/Users/vika/Downloads/laba1.xlsx");
+        data = dataController.loadData("/Users/vika/Downloads/laba1.xlsx");
     }//GEN-LAST:event_jButtonImportActionPerformed
 
     /**

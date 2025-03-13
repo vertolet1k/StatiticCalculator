@@ -20,37 +20,39 @@ import org.apache.poi.xssf.usermodel.*;
 public class ActionWithData implements DataController{
     
     ArrayList<double[]> data = new ArrayList<>();
-    
-//    @Override
+
     public ArrayList<double[]> loadData(String file){
         try (FileInputStream fis = new FileInputStream(file)) {
             Workbook workbook = new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheetAt(0);
+//            double[] mas = new double[sheet.getLastRowNum()];
+            for (int o = 0; o <= sheet.getRow(0).getLastCellNum() - 1; o++){
+                double[] mas = new double[sheet.getLastRowNum()];
+                data.add(mas);
+            }
             int p = 0;
             for (Row row : sheet) {
-                double[] mas = new double[sheet.getRow(0).getLastCellNum()];
-                data.add(mas);
                 int k = 0;
                 for (Cell cell : row) {
                     if (cell.getCellType() == CellType.NUMERIC){
-                        data.get(p - 1)[k] = cell.getNumericCellValue();
+                        data.get(k)[p - 1] = cell.getNumericCellValue();
                         k++;
-                    } 
+                    }
                 } p++;
             }
-//            for (double[] i: rowData){
-//                for (double j: i){
-//                    System.out.println(j);
-//                }
-//                System.out.println("");
-//            }
+            for (double[] i: data){
+                System.out.println(i.length);
+                for (double j: i){
+                    System.out.println(j);
+                }
+                System.out.println("");
+            } 
         } catch (IOException ex) {
             System.out.println("IOExeption");
         }
         return data;
     }
     
-//    @Override
     public void exportData(ArrayList<double[]> result){
         Workbook workbook = new HSSFWorkbook();
         Sheet sheet = workbook.createSheet("Results");
