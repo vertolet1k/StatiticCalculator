@@ -6,6 +6,7 @@ package view;
 
 import controller.*;
 import java.util.*;
+import javax.swing.*;
 import model.*;
 
 /**
@@ -17,8 +18,11 @@ public class GUI extends javax.swing.JFrame {
     
     ArrayList<double[]> data = new ArrayList();
     ArrayList<Double> result = new ArrayList();
+    ArrayList<double[]> resultOfConInterval = new ArrayList();
+    ArrayList<Double> resultOfCorelation = new ArrayList();
     DataController dataController = new ActionWithData();
     CalcationController calculationController = new Calculation();
+    int flag = 0;
 
     /**
      * Creates new form GUI
@@ -79,15 +83,13 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButtonExit)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButtonCalc)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonCalc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButtonExit))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -96,9 +98,9 @@ public class GUI extends javax.swing.JFrame {
                 .addComponent(jButtonExit)
                 .addGap(55, 55, 55)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonCalc, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButtonCalc, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(90, Short.MAX_VALUE))
         );
 
@@ -110,14 +112,50 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonExitActionPerformed
 
     private void jButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExportActionPerformed
-//        dataController.exportData(result);
+        if (result.isEmpty()){
+            JOptionPane.showMessageDialog(this,"Не был произведен процесс расчет статистических показателей или данные не были загружены в программу", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            dataController.exportData(result, resultOfConInterval, resultOfCorelation);
+            JOptionPane.showMessageDialog(this,"Данные успешно сохранены, путь к файлу: /Users/vika/Downloads/laba.xlsx", "Success", JOptionPane.INFORMATION_MESSAGE);
+        }
     }//GEN-LAST:event_jButtonExportActionPerformed
 
     private void jButtonCalcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalcActionPerformed
+        if (flag == 1){
+            for (double[] i : data){
+                result.add(calculationController.geomMean(i));
+                result.add(calculationController.arithMean(i));
+                result.add(calculationController.std(i));
+                result.add(calculationController.range(i));
+                result.add((double) calculationController.volume(i));
+                result.add(calculationController.variation(i));
+                result.add(calculationController.var(i));
+                result.add(calculationController.min(i));
+                result.add(calculationController.max(i));
+
+                resultOfConInterval.add(calculationController.conInterval(i));
+
+                for (double[] j: data){
+    //                System.out.println(i);
+    //                System.out.println(j);
+    //                System.out.println("");
+                    resultOfCorelation.add(calculationController.cov(i, j));
+                }
+            }
+            JOptionPane.showMessageDialog(this,"Расчеты успешно произведены, теперь можно сохранить их в файл (кнопка 'export results')", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this,"Невозможно произвести расчеты, тк данные не были загружены в программу (сначала нажмите кнопку 'import data')", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_jButtonCalcActionPerformed
 
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed
         data = dataController.loadData("/Users/vika/Downloads/laba1.xlsx");
+        if (data.isEmpty()){
+            JOptionPane.showMessageDialog(this,"неверный путь к файлу", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this,"Данные успешно загружены, теперь можно произвести по ним рассчет (кнопка 'make calculations')", "Success", JOptionPane.INFORMATION_MESSAGE);
+            flag = 1;
+        } 
     }//GEN-LAST:event_jButtonImportActionPerformed
 
     /**

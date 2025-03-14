@@ -12,5 +12,5 @@ import java.util.*;
  */
 public interface DataController {
     ArrayList<double[]> loadData(String file);
-    void exportData(ArrayList<double[]> result);
+    void exportData(ArrayList<Double> result, ArrayList<double[]> resultOfConInterval, ArrayList<Double> resultOfCorelation);
 }

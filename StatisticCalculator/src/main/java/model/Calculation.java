@@ -4,23 +4,28 @@
  */
 package model;
 
-import org.apache.commons.math3.stat.correlation.Covariance;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import controller.*;
+import org.apache.commons.math3.distribution.*;
+import org.apache.commons.math3.stat.correlation.*;
+import org.apache.commons.math3.stat.descriptive.*;
 
 /**
  *
  * @author vika
  */
-public class Calculation {
+public class Calculation implements CalcationController{
     
     private DescriptiveStatistics stats;
     
-    public Double geomMean(double[] x){ 
+    public double geomMean(double[] x){
+        for (int i = 0; i < x.length; i++){
+            x[i]= Math.abs(x[i]);
+        }
         stats = new DescriptiveStatistics(x);
         return stats.getGeometricMean();
     }
     
-    public Double arithMean(double[] x){ 
+    public double arithMean(double[] x){ 
         stats = new DescriptiveStatistics(x);
         return stats.getMean();
     }
@@ -52,9 +57,14 @@ public class Calculation {
     }
     
     public double[] conInterval(double[] x){ //доверительный интервал 
+        double confidenceLevel = 0.95;
+        double alpha = 1 - confidenceLevel;
+        TDistribution tDistribution = new TDistribution((int) volume(x) - 1);
+        double tValue = tDistribution.inverseCumulativeProbability(1 - alpha / 2);
+        
         stats = new DescriptiveStatistics(x);
-        double leftLimit = arithMean(x) - 1.96 * (std(x) / volume(x));
-        double rightLimit = arithMean(x) + 1.96 * (std(x) / volume(x));
+        double leftLimit = arithMean(x) - tValue * (std(x) / Math.sqrt(volume(x)));
+        double rightLimit = arithMean(x) + tValue * (std(x) / volume(x));
         double[] CI = {leftLimit, rightLimit};
         return CI;
     }
