@@ -40,18 +40,32 @@ public class ActionWithData implements DataController{
                 int k = 0;
                 int h = 0;
                 for (Cell cell : row) {
-                    if (cell.getCellType() == CellType.NUMERIC){
+                    if (cell.getCellType() == CellType.NUMERIC){    
                         data.get(k)[p - 1] = cell.getNumericCellValue();
                         k++;
                     } else {
-                        variables[h] = cell.getStringCellValue();
-                        h++;
+                        if (cell.getCellType() == CellType.STRING){
+                            variables[h] = cell.getStringCellValue();
+                            h++;}
+                        else {
+                            cell.removeFormula();
+                            data.get(k)[p - 1] = (double) cell.getNumericCellValue();
+                            k++;
+                        }
                     }
                 } p++;
             }
         } catch (IOException ex) {
             System.out.println("IOExeption");
         }
+        
+//        for (double[] i: data){
+//            for (double j: i){
+//                System.out.println(j);
+//            }
+//            System.out.println("");
+//        }
+        
         return data;
     }
     
@@ -59,6 +73,7 @@ public class ActionWithData implements DataController{
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Results");
         Row row = sheet.createRow(0);
+        
         String[] statistics = {"", "среднее геометрическое", "среднее арифметическое", "стандартное отклонение", "размах", " количество элементов в выборке", "коэффициент вариации", "дисперсия", "максимум", "минимум"};
         for (int i = 0; i < statistics.length; i++){
             row.createCell(i).setCellValue(statistics[i]);
@@ -74,6 +89,7 @@ public class ActionWithData implements DataController{
             }
             row.createCell(i - k * (statistics.length - 1)).setCellValue(result.get(i - 1));
         }
+        
         row = sheet.createRow(sheet.getLastRowNum() + 2);
         row.createCell(0).setCellValue("доверительный интервал");
         for (int i = 0; i < resultOfConInterval.size(); i++){
@@ -88,7 +104,7 @@ public class ActionWithData implements DataController{
         int t = 0;
         row = sheet.createRow(sheet.getLastRowNum() + 1);
         row.createCell(0).setCellValue(variables[0]);
-         System.out.println(resultOfCorelation);
+        System.out.println(resultOfCorelation);
         for (int i = 1; i < resultOfCorelation.size() + 1; i++){
             if (((i - 1) % (variables.length) == 0) && ((i - 1) != 0)) {
                 row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -101,11 +117,28 @@ public class ActionWithData implements DataController{
         try { 
             FileOutputStream out = new FileOutputStream(new File("/Users/vika/Downloads/laba.xlsx")); 
             workbook.write(out); 
-            out.close(); 
-            System.out.println("laba.xlsx written successfully on disk.");
+            out.close();
         } catch (Exception e) { 
             e.printStackTrace(); 
         }
     }
+     
+     public void statistics(Row row, ArrayList<Double> result, Sheet sheet) {
+        String[] statistics = {"", "среднее геометрическое", "среднее арифметическое", "стандартное отклонение", "размах", " количество элементов в выборке", "коэффициент вариации", "дисперсия", "максимум", "минимум"};
+        for (int i = 0; i < statistics.length; i++){
+            row.createCell(i).setCellValue(statistics[i]);
+        }
+        int k = 0;
+        row = sheet.createRow(1);
+        row.createCell(0).setCellValue(variables[0]);
+        for (int i = 1; i < result.size() + 1; i++) {
+            if (((i - 1) % (statistics.length - 1) == 0) && ((i - 1) != 0)) {
+                row = sheet.createRow(k + 2);
+                row.createCell(0).setCellValue(variables[k + 1]);
+                k++;
+            }
+            row.createCell(i - k * (statistics.length - 1)).setCellValue(result.get(i - 1));
+        }
+     }
     
 }

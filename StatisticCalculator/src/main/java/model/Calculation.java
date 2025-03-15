@@ -19,9 +19,15 @@ public class Calculation implements CalcationController{
     
     public double geomMean(double[] x){
         for (int i = 0; i < x.length; i++){
+                    System.out.println(x[i]);
+                }
+                System.out.println("");
+        for (int i = 0; i < x.length; i++){
             x[i]= Math.abs(x[i]);
         }
+        
         stats = new DescriptiveStatistics(x);
+        System.out.println(stats.getGeometricMean());
         return stats.getGeometricMean();
     }
     
@@ -43,6 +49,7 @@ public class Calculation implements CalcationController{
     public double cov(double[] x, double[] y){ //коэффициент ковариации
         stats = new DescriptiveStatistics(x);
         Covariance covariance = new Covariance();
+//        System.out.println(covariance.covariance(x, y));
         return covariance.covariance(x, y);
     }
     
@@ -60,11 +67,11 @@ public class Calculation implements CalcationController{
         double confidenceLevel = 0.95;
         double alpha = 1 - confidenceLevel;
         TDistribution tDistribution = new TDistribution((int) volume(x) - 1);
-        double tValue = tDistribution.inverseCumulativeProbability(1 - alpha / 2);
+        double tValue = tDistribution.inverseCumulativeProbability(alpha / 2);
         
         stats = new DescriptiveStatistics(x);
         double leftLimit = arithMean(x) - tValue * (std(x) / Math.sqrt(volume(x)));
-        double rightLimit = arithMean(x) + tValue * (std(x) / volume(x));
+        double rightLimit = arithMean(x) + tValue * (std(x) / Math.sqrt(volume(x)));
         double[] CI = {leftLimit, rightLimit};
         return CI;
     }

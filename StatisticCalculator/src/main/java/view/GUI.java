@@ -122,24 +122,28 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonCalcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalcActionPerformed
         if (flag == 1){
-            for (double[] i : data){
-                result.add(calculationController.geomMean(i));
-                result.add(calculationController.arithMean(i));
-                result.add(calculationController.std(i));
-                result.add(calculationController.range(i));
-                result.add((double) calculationController.volume(i));
-                result.add(calculationController.variation(i));
-                result.add(calculationController.var(i));
-                result.add(calculationController.min(i));
-                result.add(calculationController.max(i));
+//            for (double[] i : data){
+            for (int i = 0; i < data.size(); i++){
+                
+                
+                
+                result.add(calculationController.geomMean(data.get(i)));
+                result.add(calculationController.arithMean(data.get(i)));
+                result.add(calculationController.std(data.get(i)));
+                result.add(calculationController.range(data.get(i)));
+                result.add((double) calculationController.volume(data.get(i)));
+                result.add(calculationController.variation(data.get(i)));
+                result.add(calculationController.var(data.get(i)));
+                result.add(calculationController.min(data.get(i)));
+                result.add(calculationController.max(data.get(i)));
 
-                resultOfConInterval.add(calculationController.conInterval(i));
+                resultOfConInterval.add(calculationController.conInterval(data.get(i)));
 
-                for (double[] j: data){
-    //                System.out.println(i);
-    //                System.out.println(j);
-    //                System.out.println("");
-                    resultOfCorelation.add(calculationController.cov(i, j));
+                for (int j = 0; j < data.size(); j++){
+//                    System.out.println(data.get(i)[0]);
+//                    System.out.println(data.get(j)[0]);
+                    resultOfCorelation.add(calculationController.cov(data.get(i), data.get(j)));
+//                    System.out.println("");
                 }
             }
             JOptionPane.showMessageDialog(this,"Расчеты успешно произведены, теперь можно сохранить их в файл (кнопка 'export results')", "Success", JOptionPane.INFORMATION_MESSAGE);
