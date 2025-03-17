@@ -27,7 +27,6 @@ public class Calculation implements CalcationController{
         }
         
         stats = new DescriptiveStatistics(x);
-        System.out.println(stats.getGeometricMean());
         return stats.getGeometricMean();
     }
     

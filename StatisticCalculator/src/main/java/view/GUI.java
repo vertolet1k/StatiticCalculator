@@ -16,13 +16,13 @@ import model.*;
 public class GUI extends javax.swing.JFrame {
     
     
-    ArrayList<double[]> data = new ArrayList();
-    ArrayList<Double> result = new ArrayList();
-    ArrayList<double[]> resultOfConInterval = new ArrayList();
-    ArrayList<Double> resultOfCorelation = new ArrayList();
-    DataController dataController = new ActionWithData();
-    CalcationController calculationController = new Calculation();
-    int flag = 0;
+    private ArrayList<double[]> data = new ArrayList();
+    private ArrayList<Double> result = new ArrayList();
+    private ArrayList<double[]> resultOfConInterval = new ArrayList();
+    private ArrayList<Double> resultOfCorelation = new ArrayList();
+    private DataController dataController = new ActionWithData();
+    private CalcationController calculationController = new Calculation();
+    private int flag = 0;
 
     /**
      * Creates new form GUI
@@ -113,53 +113,55 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExportActionPerformed
         if (result.isEmpty()){
-            JOptionPane.showMessageDialog(this,"Не был произведен процесс расчет статистических показателей или данные не были загружены в программу", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Не был произведен процесс расчет статистических показателей "
+                    + "или данные не были загружены в программу", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             dataController.exportData(result, resultOfConInterval, resultOfCorelation);
-            JOptionPane.showMessageDialog(this,"Данные успешно сохранены, путь к файлу: /Users/vika/Downloads/laba.xlsx", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Данные успешно сохранены, "
+                    + "путь к файлу: /Users/vika/Downloads/laba.xlsx", "Success", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_jButtonExportActionPerformed
 
     private void jButtonCalcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalcActionPerformed
-        if (flag == 1){
-//            for (double[] i : data){
-            for (int i = 0; i < data.size(); i++){
-                
-                
-                
-                result.add(calculationController.geomMean(data.get(i)));
-                result.add(calculationController.arithMean(data.get(i)));
-                result.add(calculationController.std(data.get(i)));
-                result.add(calculationController.range(data.get(i)));
-                result.add((double) calculationController.volume(data.get(i)));
-                result.add(calculationController.variation(data.get(i)));
-                result.add(calculationController.var(data.get(i)));
-                result.add(calculationController.min(data.get(i)));
-                result.add(calculationController.max(data.get(i)));
+    if (flag == 1){
+        for (int i = 0; i < data.size(); i++){
+            result.add(calculationController.geomMean(data.get(i)));
+            result.add(calculationController.arithMean(data.get(i)));
+            result.add(calculationController.std(data.get(i)));
+            result.add(calculationController.range(data.get(i)));
+            result.add((double) calculationController.volume(data.get(i)));
+            result.add(calculationController.variation(data.get(i)));
+            result.add(calculationController.var(data.get(i)));
+            result.add(calculationController.min(data.get(i)));
+            result.add(calculationController.max(data.get(i)));
 
-                resultOfConInterval.add(calculationController.conInterval(data.get(i)));
+            resultOfConInterval.add(calculationController.conInterval(data.get(i)));
 
-                for (int j = 0; j < data.size(); j++){
+            for (int j = 0; j < data.size(); j++){
 //                    System.out.println(data.get(i)[0]);
 //                    System.out.println(data.get(j)[0]);
-                    resultOfCorelation.add(calculationController.cov(data.get(i), data.get(j)));
+                resultOfCorelation.add(calculationController.cov(data.get(i), data.get(j)));
 //                    System.out.println("");
-                }
             }
-            JOptionPane.showMessageDialog(this,"Расчеты успешно произведены, теперь можно сохранить их в файл (кнопка 'export results')", "Success", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this,"Невозможно произвести расчеты, тк данные не были загружены в программу (сначала нажмите кнопку 'import data')", "Error", JOptionPane.ERROR_MESSAGE);
         }
+        JOptionPane.showMessageDialog(this,"Расчеты успешно произведены, теперь можно сохранить их в файл "
+                + "(кнопка 'export results')", "Success", JOptionPane.INFORMATION_MESSAGE);
+    } else {
+        JOptionPane.showMessageDialog(this,"Невозможно произвести расчеты, тк данные не были "
+                + "загружены в программу (сначала нажмите кнопку 'import data')", "Error", JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_jButtonCalcActionPerformed
 
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed
         data = dataController.loadData("/Users/vika/Downloads/laba1.xlsx");
         if (data.isEmpty()){
-            JOptionPane.showMessageDialog(this,"неверный путь к файлу", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,"неверный путь к файлу", "Error", 
+                    JOptionPane.ERROR_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(this,"Данные успешно загружены, теперь можно произвести по ним рассчет (кнопка 'make calculations')", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Данные успешно загружены, теперь можно произвести по ним рассчет "
+                    + "(кнопка 'make calculations')", "Success", JOptionPane.INFORMATION_MESSAGE);
             flag = 1;
-        } 
+        }
     }//GEN-LAST:event_jButtonImportActionPerformed
 
     /**

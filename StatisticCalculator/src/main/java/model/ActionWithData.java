@@ -19,8 +19,8 @@ import org.apache.poi.xssf.usermodel.*;
  */
 public class ActionWithData implements DataController{
     
-    ArrayList<double[]> data = new ArrayList<>();
-    String[] variables;
+    private ArrayList<double[]> data = new ArrayList<>();
+    private String[] variables;
 
     public ArrayList<double[]> loadData(String file){
         
@@ -59,22 +59,33 @@ public class ActionWithData implements DataController{
             System.out.println("IOExeption");
         }
         
-//        for (double[] i: data){
-//            for (double j: i){
-//                System.out.println(j);
-//            }
-//            System.out.println("");
-//        }
-        
         return data;
     }
     
      public void exportData(ArrayList<Double> result, ArrayList<double[]> resultOfConInterval, ArrayList<Double> resultOfCorelation) {
+         
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Results");
         Row row = sheet.createRow(0);
         
-        String[] statistics = {"", "среднее геометрическое", "среднее арифметическое", "стандартное отклонение", "размах", " количество элементов в выборке", "коэффициент вариации", "дисперсия", "максимум", "минимум"};
+        statistics(row, result, sheet);
+        
+        CI(row, resultOfConInterval, sheet);
+        
+        corelation(row, resultOfCorelation, sheet);
+        
+        try { 
+            FileOutputStream out = new FileOutputStream(new File("/Users/vika/Downloads/laba.xlsx")); 
+            workbook.write(out); 
+            out.close();
+        } catch (Exception e) { 
+            e.printStackTrace(); 
+        }
+    }
+     
+     public void statistics(Row row, ArrayList<Double> result, Sheet sheet) {
+        String[] statistics = {"", "среднее геометрическое", "среднее арифметическое", "стандартное отклонение", 
+            "размах", " количество элементов в выборке", "коэффициент вариации", "дисперсия", "максимум", "минимум"};
         for (int i = 0; i < statistics.length; i++){
             row.createCell(i).setCellValue(statistics[i]);
         }
@@ -89,13 +100,17 @@ public class ActionWithData implements DataController{
             }
             row.createCell(i - k * (statistics.length - 1)).setCellValue(result.get(i - 1));
         }
-        
+     }
+     
+     public void CI(Row row, ArrayList<double[]> resultOfConInterval, Sheet sheet) {
         row = sheet.createRow(sheet.getLastRowNum() + 2);
         row.createCell(0).setCellValue("доверительный интервал");
         for (int i = 0; i < resultOfConInterval.size(); i++){
             row.createCell(i + 1).setCellValue(resultOfConInterval.get(i)[0] + " - " + resultOfConInterval.get(i)[1]);
         }
-        
+     }
+    
+     public void corelation(Row row, ArrayList<Double> resultOfCorelation, Sheet sheet) {
         row = sheet.createRow(sheet.getLastRowNum() + 2);
         row.createCell(0).setCellValue("ковариация");
         for (int i = 1; i < variables.length + 1; i++){
@@ -113,32 +128,6 @@ public class ActionWithData implements DataController{
             }   
             row.createCell(i - t * (variables.length)).setCellValue(resultOfCorelation.get(i - 1));
         }
-        
-        try { 
-            FileOutputStream out = new FileOutputStream(new File("/Users/vika/Downloads/laba.xlsx")); 
-            workbook.write(out); 
-            out.close();
-        } catch (Exception e) { 
-            e.printStackTrace(); 
-        }
-    }
-     
-     public void statistics(Row row, ArrayList<Double> result, Sheet sheet) {
-        String[] statistics = {"", "среднее геометрическое", "среднее арифметическое", "стандартное отклонение", "размах", " количество элементов в выборке", "коэффициент вариации", "дисперсия", "максимум", "минимум"};
-        for (int i = 0; i < statistics.length; i++){
-            row.createCell(i).setCellValue(statistics[i]);
-        }
-        int k = 0;
-        row = sheet.createRow(1);
-        row.createCell(0).setCellValue(variables[0]);
-        for (int i = 1; i < result.size() + 1; i++) {
-            if (((i - 1) % (statistics.length - 1) == 0) && ((i - 1) != 0)) {
-                row = sheet.createRow(k + 2);
-                row.createCell(0).setCellValue(variables[k + 1]);
-                k++;
-            }
-            row.createCell(i - k * (statistics.length - 1)).setCellValue(result.get(i - 1));
-        }
      }
-    
+     
 }
