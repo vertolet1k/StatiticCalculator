@@ -9,6 +9,9 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
@@ -21,8 +24,15 @@ public class ActionWithData implements DataController{
     
     private ArrayList<double[]> data = new ArrayList<>();
     private String[] variables;
+    File file;
 
-    public ArrayList<double[]> loadData(String file){
+    public ArrayList<double[]> loadData(){
+        
+        JFileChooser fileopen = new JFileChooser();
+        int l = fileopen.showDialog(null, "Открыть файл");                
+        if (l == JFileChooser.APPROVE_OPTION) {
+            file = fileopen.getSelectedFile();
+        }
         
         try (FileInputStream fis = new FileInputStream(file)) {
             
@@ -62,7 +72,7 @@ public class ActionWithData implements DataController{
         return data;
     }
     
-     public void exportData(ArrayList<Double> result, ArrayList<double[]> resultOfConInterval, ArrayList<Double> resultOfCorelation) {
+    public void exportData(ArrayList<Double> result, ArrayList<double[]> resultOfConInterval, ArrayList<Double> resultOfCorelation) {
          
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Results");
@@ -74,11 +84,23 @@ public class ActionWithData implements DataController{
         
         corelation(row, resultOfCorelation, sheet);
         
-        try { 
-            FileOutputStream out = new FileOutputStream(new File("/Users/vika/Downloads/laba.xlsx")); 
-            workbook.write(out); 
-            out.close();
-        } catch (Exception e) { 
+        variables = null;
+        data.clear();
+        
+        
+        try {
+            JFileChooser fileopen = new JFileChooser();
+            int l = fileopen.showDialog(null, "Сохранить файл");
+            if (l == JFileChooser.APPROVE_OPTION) {
+                file = fileopen.getSelectedFile();
+                try {
+                    FileOutputStream out = new FileOutputStream(file); 
+                    workbook.write(out);
+                    out.close();
+                } catch (IOException ex) {
+                    System.out.println("ОШИБКА");
+                }
+        }}catch (Exception e) { 
             e.printStackTrace(); 
         }
     }
@@ -92,6 +114,7 @@ public class ActionWithData implements DataController{
         int k = 0;
         row = sheet.createRow(1);
         row.createCell(0).setCellValue(variables[0]);
+         System.out.println(result.size());
         for (int i = 1; i < result.size() + 1; i++) {
             if (((i - 1) % (statistics.length - 1) == 0) && ((i - 1) != 0)) {
                 row = sheet.createRow(k + 2);
@@ -119,7 +142,6 @@ public class ActionWithData implements DataController{
         int t = 0;
         row = sheet.createRow(sheet.getLastRowNum() + 1);
         row.createCell(0).setCellValue(variables[0]);
-        System.out.println(resultOfCorelation);
         for (int i = 1; i < resultOfCorelation.size() + 1; i++){
             if (((i - 1) % (variables.length) == 0) && ((i - 1) != 0)) {
                 row = sheet.createRow(sheet.getLastRowNum() + 1);

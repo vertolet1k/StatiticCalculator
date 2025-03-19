@@ -17,15 +17,7 @@ public class Calculation implements CalcationController{
     
     private DescriptiveStatistics stats;
     
-    public double geomMean(double[] x){
-        for (int i = 0; i < x.length; i++){
-                    System.out.println(x[i]);
-                }
-                System.out.println("");
-        for (int i = 0; i < x.length; i++){
-            x[i]= Math.abs(x[i]);
-        }
-        
+    public double geomMean(double[] x) {
         stats = new DescriptiveStatistics(x);
         return stats.getGeometricMean();
     }
@@ -48,7 +40,6 @@ public class Calculation implements CalcationController{
     public double cov(double[] x, double[] y){ //коэффициент ковариации
         stats = new DescriptiveStatistics(x);
         Covariance covariance = new Covariance();
-//        System.out.println(covariance.covariance(x, y));
         return covariance.covariance(x, y);
     }
     

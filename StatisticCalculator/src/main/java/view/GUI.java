@@ -86,22 +86,24 @@ public class GUI extends javax.swing.JFrame {
                         .addComponent(jButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonCalc)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jButtonExit))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButtonExit)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButtonExit)
-                .addGap(55, 55, 55)
+                .addGap(63, 63, 63)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonCalc, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonCalc, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(90, Short.MAX_VALUE))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         pack();
@@ -138,10 +140,7 @@ public class GUI extends javax.swing.JFrame {
             resultOfConInterval.add(calculationController.conInterval(data.get(i)));
 
             for (int j = 0; j < data.size(); j++){
-//                    System.out.println(data.get(i)[0]);
-//                    System.out.println(data.get(j)[0]);
                 resultOfCorelation.add(calculationController.cov(data.get(i), data.get(j)));
-//                    System.out.println("");
             }
         }
         JOptionPane.showMessageDialog(this,"Расчеты успешно произведены, теперь можно сохранить их в файл "
@@ -153,7 +152,7 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonCalcActionPerformed
 
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed
-        data = dataController.loadData("/Users/vika/Downloads/laba1.xlsx");
+        data = dataController.loadData();
         if (data.isEmpty()){
             JOptionPane.showMessageDialog(this,"неверный путь к файлу", "Error", 
                     JOptionPane.ERROR_MESSAGE);
