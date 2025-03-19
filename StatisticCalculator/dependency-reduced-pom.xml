@@ -18,7 +18,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.mephi.detectives.view.GUI</mainClass>
+                  <mainClass>view.GUI</mainClass>
                 </transformer>
               </transformers>
             </configuration>
