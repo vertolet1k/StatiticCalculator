@@ -4,15 +4,10 @@
  */
 package model;
 
-import controller.DataController;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
+import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
@@ -20,24 +15,22 @@ import org.apache.poi.xssf.usermodel.*;
  *
  * @author vika
  */
-public class ActionWithData implements DataController{
+public class ActionWithExcel {
     
-    private ArrayList<double[]> data = new ArrayList<>();
-    private String[] variables;
-    File file;
-
-    public ArrayList<double[]> loadData(){
-        
-        JFileChooser fileopen = new JFileChooser();
-        int l = fileopen.showDialog(null, "Открыть файл");                
-        if (l == JFileChooser.APPROVE_OPTION) {
-            file = fileopen.getSelectedFile();
-        }
-        
+    String[] variables;
+    String[] sheets;
+    
+    public ArrayList<double[]> loadData(File file, ArrayList<double[]> data, int index){
+    
         try (FileInputStream fis = new FileInputStream(file)) {
             
             Workbook workbook = new XSSFWorkbook(fis);
-            Sheet sheet = workbook.getSheetAt(0);
+            Sheet sheet = workbook.getSheetAt(index);
+            sheets = null;
+            sheets = new String[workbook.getNumberOfSheets()];
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                sheets[i] = workbook.getSheetName(i);
+            }
             
             variables = new String[sheet.getRow(0).getLastCellNum()];
             for (int o = 0; o <= sheet.getRow(0).getLastCellNum() - 1; o++){
@@ -50,6 +43,7 @@ public class ActionWithData implements DataController{
                 int k = 0;
                 int h = 0;
                 for (Cell cell : row) {
+                    cell.removeFormula();
                     if (cell.getCellType() == CellType.NUMERIC){    
                         data.get(k)[p - 1] = cell.getNumericCellValue();
                         k++;
@@ -57,55 +51,66 @@ public class ActionWithData implements DataController{
                         if (cell.getCellType() == CellType.STRING){
                             variables[h] = cell.getStringCellValue();
                             h++;}
-                        else {
-                            cell.removeFormula();
-                            data.get(k)[p - 1] = (double) cell.getNumericCellValue();
-                            k++;
-                        }
+//                        else {
+//                            cell.removeFormula();
+//                            data.get(k)[p - 1] = (double) cell.getNumericCellValue();
+//                            k++;
+//                        }
                     }
                 } p++;
             }
         } catch (IOException ex) {
             System.out.println("IOExeption");
+            return data;
+        } catch (OLE2NotOfficeXmlFileException a){
+            System.out.println("OLE2NotOfficeXmlFileException");
+            return data;
+        } catch (NullPointerException e){
+            System.out.println("NullPointerException");
+            return data;
+        } catch (NotOfficeXmlFileException e) {
+            System.out.println("NotOfficeXmlFileException");
+            return data;
+        } catch (IllegalArgumentException e) {
+            System.out.println("IllegalArgumentException");
+            return data;
         }
-        
         return data;
     }
     
-    public void exportData(ArrayList<Double> result, ArrayList<double[]> resultOfConInterval, ArrayList<Double> resultOfCorelation) {
-         
+    public String[] getVariables() {
+        return variables;
+    }
+    
+    public String[] getSheets() {
+        return sheets;
+    }
+    
+    
+    public void exportData(File file, String[] variables, ArrayList<Double> result, ArrayList<double[]> resultOfConInterval, ArrayList<Double> resultOfCorelation) {
+        
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Results");
         Row row = sheet.createRow(0);
+
+        printStatistics(row, variables, result, sheet);
         
-        statistics(row, result, sheet);
+        printCI(row, variables, resultOfConInterval, sheet);
         
-        CI(row, resultOfConInterval, sheet);
-        
-        corelation(row, resultOfCorelation, sheet);
-        
-        variables = null;
-        data.clear();
-        
+        printCorelation(row, variables, resultOfCorelation, sheet);        
         
         try {
-            JFileChooser fileopen = new JFileChooser();
-            int l = fileopen.showDialog(null, "Сохранить файл");
-            if (l == JFileChooser.APPROVE_OPTION) {
-                file = fileopen.getSelectedFile();
-                try {
-                    FileOutputStream out = new FileOutputStream(file); 
-                    workbook.write(out);
-                    out.close();
-                } catch (IOException ex) {
-                    System.out.println("ОШИБКА");
-                }
-        }}catch (Exception e) { 
+            FileOutputStream out = new FileOutputStream(file); 
+            workbook.write(out);
+            out.close();
+        } catch (IOException ex) {
+            System.out.println("ОШИБКА");
+        }catch (Exception e) { 
             e.printStackTrace(); 
         }
     }
      
-     public void statistics(Row row, ArrayList<Double> result, Sheet sheet) {
+     public void printStatistics(Row row, String[] variables, ArrayList<Double> result, Sheet sheet) {
         String[] statistics = {"", "среднее геометрическое", "среднее арифметическое", "стандартное отклонение", 
             "размах", " количество элементов в выборке", "коэффициент вариации", "дисперсия", "максимум", "минимум"};
         for (int i = 0; i < statistics.length; i++){
@@ -114,7 +119,6 @@ public class ActionWithData implements DataController{
         int k = 0;
         row = sheet.createRow(1);
         row.createCell(0).setCellValue(variables[0]);
-         System.out.println(result.size());
         for (int i = 1; i < result.size() + 1; i++) {
             if (((i - 1) % (statistics.length - 1) == 0) && ((i - 1) != 0)) {
                 row = sheet.createRow(k + 2);
@@ -125,7 +129,7 @@ public class ActionWithData implements DataController{
         }
      }
      
-     public void CI(Row row, ArrayList<double[]> resultOfConInterval, Sheet sheet) {
+     public void printCI(Row row, String[] variables, ArrayList<double[]> resultOfConInterval, Sheet sheet) {
         row = sheet.createRow(sheet.getLastRowNum() + 2);
         row.createCell(0).setCellValue("доверительный интервал");
         for (int i = 0; i < resultOfConInterval.size(); i++){
@@ -133,7 +137,7 @@ public class ActionWithData implements DataController{
         }
      }
     
-     public void corelation(Row row, ArrayList<Double> resultOfCorelation, Sheet sheet) {
+     public void printCorelation(Row row, String[] variables, ArrayList<Double> resultOfCorelation, Sheet sheet) {
         row = sheet.createRow(sheet.getLastRowNum() + 2);
         row.createCell(0).setCellValue("ковариация");
         for (int i = 1; i < variables.length + 1; i++){
@@ -150,6 +154,6 @@ public class ActionWithData implements DataController{
             }   
             row.createCell(i - t * (variables.length)).setCellValue(resultOfCorelation.get(i - 1));
         }
-     }
+    }
      
 }

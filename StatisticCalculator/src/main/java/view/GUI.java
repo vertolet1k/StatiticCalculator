@@ -5,9 +5,8 @@
 package view;
 
 import controller.*;
-import java.util.*;
+import java.io.File;
 import javax.swing.*;
-import model.*;
 
 /**
  *
@@ -15,14 +14,9 @@ import model.*;
  */
 public class GUI extends javax.swing.JFrame {
     
-    
-    private ArrayList<double[]> data = new ArrayList();
-    private ArrayList<Double> result = new ArrayList();
-    private ArrayList<double[]> resultOfConInterval = new ArrayList();
-    private ArrayList<Double> resultOfCorelation = new ArrayList();
-    private DataController dataController = new ActionWithData();
-    private CalcationController calculationController = new Calculation();
-    private int flag = 0;
+    Controller control = new Controller();
+    File file;
+    int index = 0;
 
     /**
      * Creates new form GUI
@@ -44,6 +38,7 @@ public class GUI extends javax.swing.JFrame {
         jButtonImport = new javax.swing.JButton();
         jButtonExport = new javax.swing.JButton();
         jButtonCalc = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -75,6 +70,12 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -83,14 +84,15 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonCalc)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButtonCalc))
+                    .addComponent(jButtonExit)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButtonExit)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(75, 75, 75)
+                        .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(93, 93, 93)
+                        .addComponent(jComboBox1, 0, 120, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -98,12 +100,19 @@ public class GUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButtonExit)
-                .addGap(63, 63, 63)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonCalc, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(82, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButtonCalc, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(12, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(76, 76, 76))))
         );
 
         pack();
@@ -114,35 +123,24 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonExitActionPerformed
 
     private void jButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExportActionPerformed
-        if (result.isEmpty()){
+        JFileChooser fileopen = new JFileChooser();
+        int l = fileopen.showDialog(null, "Сохранить файл");
+        if (l == JFileChooser.APPROVE_OPTION) {
+            file = fileopen.getSelectedFile();
+        }
+//        control.exportController(file);
+        
+        if (control.exportController(file) == 0){
             JOptionPane.showMessageDialog(this,"Не был произведен процесс расчет статистических показателей "
                     + "или данные не были загружены в программу", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            dataController.exportData(result, resultOfConInterval, resultOfCorelation);
-            JOptionPane.showMessageDialog(this,"Данные успешно сохранены, "
-                    + "путь к файлу: /Users/vika/Downloads/laba.xlsx", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Данные успешно сохранены, ",
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_jButtonExportActionPerformed
 
     private void jButtonCalcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalcActionPerformed
-    if (flag == 1){
-        for (int i = 0; i < data.size(); i++){
-            result.add(calculationController.geomMean(data.get(i)));
-            result.add(calculationController.arithMean(data.get(i)));
-            result.add(calculationController.std(data.get(i)));
-            result.add(calculationController.range(data.get(i)));
-            result.add((double) calculationController.volume(data.get(i)));
-            result.add(calculationController.variation(data.get(i)));
-            result.add(calculationController.var(data.get(i)));
-            result.add(calculationController.min(data.get(i)));
-            result.add(calculationController.max(data.get(i)));
-
-            resultOfConInterval.add(calculationController.conInterval(data.get(i)));
-
-            for (int j = 0; j < data.size(); j++){
-                resultOfCorelation.add(calculationController.cov(data.get(i), data.get(j)));
-            }
-        }
+    if (control.calculationController() == 1){
         JOptionPane.showMessageDialog(this,"Расчеты успешно произведены, теперь можно сохранить их в файл "
                 + "(кнопка 'export results')", "Success", JOptionPane.INFORMATION_MESSAGE);
     } else {
@@ -152,16 +150,34 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonCalcActionPerformed
 
     private void jButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonImportActionPerformed
-        data = dataController.loadData();
-        if (data.isEmpty()){
-            JOptionPane.showMessageDialog(this,"неверный путь к файлу", "Error", 
-                    JOptionPane.ERROR_MESSAGE);
-        } else {
+        JFileChooser fileopen = new JFileChooser();
+        int l = fileopen.showDialog(null, "Открыть файл");                
+        if (l == JFileChooser.APPROVE_OPTION) {
+            file = fileopen.getSelectedFile();
+        }
+//        String[] d = control.workBookController(file);;
+//        for (int i = 0; i < d.length; i++){
+//                jComboBox1.insertItemAt(d[i], i);
+////                jComboBox1.addItem(control.getSheets()[i]);
+//            } 
+        
+        if (control.loadController(file, index) == 1){
+            for (int i = 0; i < control.getSheets().length; i++){
+                jComboBox1.insertItemAt(control.getSheets()[i], i);
+//                jComboBox1.addItem(control.getSheets()[i]);
+            } 
+            jComboBox1.setSelectedIndex(0);
             JOptionPane.showMessageDialog(this,"Данные успешно загружены, теперь можно произвести по ним рассчет "
                     + "(кнопка 'make calculations')", "Success", JOptionPane.INFORMATION_MESSAGE);
-            flag = 1;
+        } else {
+            JOptionPane.showMessageDialog(this,"неверный путь к файлу", "Error", 
+                    JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButtonImportActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        index = jComboBox1.getSelectedIndex();
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -203,5 +219,6 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton jButtonExit;
     private javax.swing.JButton jButtonExport;
     private javax.swing.JButton jButtonImport;
+    private javax.swing.JComboBox<String> jComboBox1;
     // End of variables declaration//GEN-END:variables
 }

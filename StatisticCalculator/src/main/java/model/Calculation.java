@@ -4,7 +4,6 @@
  */
 package model;
 
-import controller.*;
 import org.apache.commons.math3.distribution.*;
 import org.apache.commons.math3.stat.correlation.*;
 import org.apache.commons.math3.stat.descriptive.*;
@@ -13,7 +12,7 @@ import org.apache.commons.math3.stat.descriptive.*;
  *
  * @author vika
  */
-public class Calculation implements CalcationController{
+public class Calculation {
     
     private DescriptiveStatistics stats;
     
